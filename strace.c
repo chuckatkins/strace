@@ -2191,12 +2191,7 @@ print_event_exit(struct tcb *tcp)
 		set_current_tcp(tcp);
 	}
 
-	if ((followfork < 2 && printing_tcp != tcp)
-	    || (tcp->flags & TCB_REPRINT)) {
-		tcp->flags &= ~TCB_REPRINT;
-		printleader(tcp);
-		tprintf("<... %s resumed>", tcp->s_ent->sys_name);
-	}
+	print_syscall_resume(tcp);
 
 	if (!(tcp->sys_func_rval & RVAL_DECODED)) {
 		/*
