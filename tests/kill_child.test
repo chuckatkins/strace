@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Check whether repeated killing of just forked processes crashes strace.
+
+. "${srcdir=.}/init.sh"
+
+run_prog "../$NAME"
+
+# Run strace until the known corner case is observed
+while :; do
+	run_strace -f -qq -esignal=none $args
+
+	# Printing of "<... SYSCALL resumed>" in strace.c:print_event_exit
+	# previously led to segfault if the syscall number hadn't been obtained
+	# on syscall entering.
+	grep -qE '^[0-9]+ <\.\.\. \?\?\?\? resumed>\) += \?$' "$LOG" && exit 0
+done
